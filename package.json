@@ -1,0 +1,11 @@
+{
+  "name": "eta-motion-project-page",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Static academic project page for ETA-Motion",
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "check": "node --check site/app.js && node --check site/config.js && node scripts/check.mjs",
+    "preview": "node scripts/serve.mjs"
+  }
+}

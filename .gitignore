@@ -1,0 +1,11 @@
+# Original research sources and large working files stay local.
+/Topology_Agnostic_Motion_Generation/
+/Topology_Agnostic_Motion_Generation.zip
+/ETA-Motion_Video.mp4
+/suppl.pptx
+/tmp/
+/output/
+/node_modules/
+.DS_Store
+Thumbs.db
+*.log

@@ -1,0 +1,14 @@
+{
+  "source": "ETA-Motion_Video.mp4",
+  "presentation": "suppl.pptx",
+  "notes": "Boundaries measured from the rendered video, including PowerPoint transition timing. End times are exclusive. The last clip stops before the closing-slide morph begins.",
+  "clips": [
+    {"slide": 12, "slug": "01-quadrupeds-walk-run", "title": "Quadrupeds: walk / run", "start": 78.969, "end": 87.483},
+    {"slide": 13, "slug": "02-quadrupeds-attack", "title": "Quadrupeds: attack", "start": 87.483, "end": 97.218},
+    {"slide": 14, "slug": "03-quadrupeds-fall-rise", "title": "Quadrupeds: fall down / rise up", "start": 97.218, "end": 102.663},
+    {"slide": 15, "slug": "04-bipeds", "title": "Bipeds", "start": 102.663, "end": 109.824},
+    {"slide": 16, "slug": "05-flying", "title": "Flying", "start": 109.824, "end": 115.698},
+    {"slide": 17, "slug": "06-reptiles-marine", "title": "Reptiles / marine", "start": 115.698, "end": 122.199},
+    {"slide": 18, "slug": "07-insects", "title": "Insects", "start": 122.199, "end": 131.439}
+  ]
+}

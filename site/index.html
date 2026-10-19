@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+  <title>ETA-Motion | Efficient Topology-Agnostic Motion Diffusion</title>
+  <meta name="description" content="ETA-Motion learns from sparse joint subsets to generate motion for full, arbitrary skeletons. Research by Seoyoung Hwang and Tae-Kyun Kim.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="ETA-Motion: Efficient Topology-Agnostic Motion Diffusion via Sparse Joint Learning">
+  <meta property="og:description" content="Learn from sparse joints. Generate motion for the full skeleton.">
+  <meta property="og:image" content="assets/images/teaser.webp">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script src="config.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <nav class="nav container" aria-label="Main navigation">
+      <a class="wordmark" href="#" aria-label="ETA-Motion home">ETA-Motion</a>
+      <div class="nav-links"><a href="#abstract">Overview</a><a href="#method">Method</a><a href="#results">Mesh results</a><a href="#citation">BibTeX <span aria-hidden="true">↗</span></a></div>
+    </nav>
+  </header>
+  <main id="main">
+    <section class="hero container" aria-labelledby="paper-title">
+      <h1 id="paper-title"><span class="project-name">ETA-Motion</span><span class="paper-subtitle">Efficient Topology-Agnostic Motion Diffusion<br class="desktop-break"> via Sparse Joint Learning</span></h1>
+      <p class="authors"><a href="mailto:seoyoung11@kaist.ac.kr">Seoyoung Hwang<sup>1,2</sup></a><a href="mailto:kimtaekyun@kaist.ac.kr">Tae-Kyun Kim<sup>1</sup></a></p>
+      <p class="affiliations"><span><sup>1</sup> KAIST</span><span><sup>2</sup> Samsung Electronics</span></p>
+      <p id="venue" class="venue">WACV 2027</p>
+      <div class="resource-links">
+        <a id="paper-link" class="button button-light" role="link" aria-disabled="true"><span aria-hidden="true">↗</span> arXiv <span class="coming-soon">· Coming soon</span></a>
+        <a class="button button-dark" href="#results"><svg viewBox="0 0 20 20" width="17" height="17" fill="currentColor" aria-hidden="true"><path d="m6 3 11 7-11 7z"/></svg> View mesh results</a>
+        <a id="code-link" class="button button-light" role="link" aria-disabled="true"><span aria-hidden="true">&lt;/&gt;</span> Code <span class="coming-soon">· Coming soon</span></a>
+        <a id="supplement-link" class="button button-light" hidden>Supplement</a>
+        <a class="button button-light" href="#abstract">Read abstract <span aria-hidden="true">↓</span></a>
+      </div>
+      <figure class="teaser">
+        <a class="figure-link" href="assets/images/teaser.webp" target="_blank" rel="noopener" aria-label="Open the teaser figure at full resolution in a new tab"><img src="assets/images/teaser.webp" alt="Sparse joint skeletons of a quadruped and a bird used for training, followed by full rigged horse and eagle motion at inference." fetchpriority="high" width="2095" height="969"></a>
+        <figcaption><strong>ETA-Motion is trained on sparse joint subsets and generates motion for full target skeletons.</strong><br>Examples of transfer from sparse skeletal observations to rigged characters.</figcaption>
+      </figure>
+    </section>
+
+    <section id="abstract" class="section abstract-section" aria-labelledby="abstract-heading">
+      <div class="container narrow">
+        <h2 id="abstract-heading">Abstract</h2>
+        <p class="abstract-text">Topology-agnostic motion generation aims to synthesize motions for diverse characters with arbitrary skeletons. Unlike conventional motion generation, which assumes a fixed skeletal template, this setting must handle diverse joint configurations and inconsistent joint semantics across characters. Existing methods address this challenge through dense full-joint modeling, which incurs substantial computational cost and hinders learning transferable motion patterns across diverse skeletal topologies. We present ETA-Motion, a topology-agnostic motion generation framework based on sparse joint learning. Instead of learning motion from all joints, our method uses a compact subset of joints to reduce redundancy and trains the motion generator on the resulting sparse skeleton. To facilitate correspondence across diverse topologies, we introduce semantic joint embeddings that combine textual and visual cues, together with topology-aware training objectives for preserving skeletal structure. Although ETA-Motion is trained only on sparse skeletal observations, it supports full-skeleton motion generation during inference. Experimental results demonstrate that ETA-Motion outperforms existing topology-agnostic baselines while significantly improving efficiency and generalization to unseen motions and unseen topologies.</p>
+      </div>
+    </section>
+
+<section id="method" class="section method-section" aria-labelledby="method-heading">
+      <div class="container">
+        <h2 id="method-heading">Method overview</h2>
+        <p class="section-intro">A text-conditioned diffusion transformer learns motion from compact skeletal observations, with semantic cues that connect joints across different characters.</p>
+        <figure class="architecture"><a class="figure-link" href="assets/images/overview.webp" target="_blank" rel="noopener" aria-label="Open the method overview at full resolution in a new tab"><img src="assets/images/overview.webp" alt="ETA-Motion architecture: textual T5 and visual DINOv2 joint embeddings condition a spatiotemporal diffusion transformer with sparse training joints, full inference skeletons, and a topology-aware loss." loading="lazy" width="1738" height="873"></a><figcaption>ETA-Motion combines sparse joint learning, semantic joint embeddings, and a topology-aware training objective.</figcaption></figure>
+        <div class="method-steps">
+          <article><span class="step-number">01</span><h3>Select representative joints</h3><p>Farthest point sampling retains a compact subset, starting from the root. Each selected joint reconnects to its nearest retained ancestor.</p></article>
+          <article><span class="step-number">02</span><h3>Connect joint semantics</h3><p>T5 joint-name features and DINOv2 visual features provide complementary cues for correspondence across different skeletal topologies.</p></article>
+          <article><span class="step-number">03</span><h3>Generate the full motion</h3><p>The target rest pose guides inference on the full skeleton. A bone-length objective encourages structural consistency during training.</p></article>
+        </div>
+        <div class="sparse-detail"><div><h3>Sparse joint selection</h3><p>Training uses <i>K</i> joints instead of the full skeleton, reducing spatial attention from O(<i>FJ</i><sup>2</sup>) to O(<i>FK</i><sup>2</sup>). Inference uses the actual number of joints in the target skeleton.</p></div><img src="assets/images/sparse.webp" alt="A full quadruped skeleton, representative joints selected in green, and the reconnected sparse skeleton." loading="lazy" width="2762" height="761"></div>
+      </div>
+    </section>
+
+    <section id="results" class="section container mesh-results" aria-labelledby="results-heading">
+      <h2 id="results-heading">Mesh animation results</h2>
+      <p class="section-intro">Generated joint positions are converted into mesh animations using inverse kinematics. Explore the motions across different characters below.</p>
+      <div class="mesh-gallery">
+        <article class="mesh-clip mesh-clip-featured">
+          <h3 id="01-quadrupeds-walk-run-heading">Quadrupeds: walk / run</h3>
+          <div class="video-frame">
+            <video class="mesh-video" controls loop muted playsinline preload="none" poster="assets/images/mesh/01-quadrupeds-walk-run.webp" aria-labelledby="01-quadrupeds-walk-run-heading" width="1920" height="1080">
+              <source src="assets/video/mesh/01-quadrupeds-walk-run.mp4" type="video/mp4">
+              <a href="assets/video/mesh/01-quadrupeds-walk-run.mp4">Download this video</a>
+            </video>
+          </div>
+          <p class="clip-caption"><span>8.5 seconds</span><a href="assets/video/mesh/01-quadrupeds-walk-run.mp4" download aria-label="Download Quadrupeds: walk / run video">Download MP4 <span aria-hidden="true">↓</span></a></p>
+        </article>
+        <article class="mesh-clip">
+          <h3 id="02-quadrupeds-attack-heading">Quadrupeds: attack</h3>
+          <div class="video-frame">
+            <video class="mesh-video" controls loop muted playsinline preload="none" poster="assets/images/mesh/02-quadrupeds-attack.webp" aria-labelledby="02-quadrupeds-attack-heading" width="1920" height="1080">
+              <source src="assets/video/mesh/02-quadrupeds-attack.mp4" type="video/mp4">
+              <a href="assets/video/mesh/02-quadrupeds-attack.mp4">Download this video</a>
+            </video>
+          </div>
+          <p class="clip-caption"><span>9.7 seconds</span><a href="assets/video/mesh/02-quadrupeds-attack.mp4" download aria-label="Download Quadrupeds: attack video">Download MP4 <span aria-hidden="true">↓</span></a></p>
+        </article>
+        <article class="mesh-clip">
+          <h3 id="03-quadrupeds-fall-rise-heading">Quadrupeds: fall down / rise up</h3>
+          <div class="video-frame">
+            <video class="mesh-video" controls loop muted playsinline preload="none" poster="assets/images/mesh/03-quadrupeds-fall-rise.webp" aria-labelledby="03-quadrupeds-fall-rise-heading" width="1920" height="1080">
+              <source src="assets/video/mesh/03-quadrupeds-fall-rise.mp4" type="video/mp4">
+              <a href="assets/video/mesh/03-quadrupeds-fall-rise.mp4">Download this video</a>
+            </video>
+          </div>
+          <p class="clip-caption"><span>5.4 seconds</span><a href="assets/video/mesh/03-quadrupeds-fall-rise.mp4" download aria-label="Download Quadrupeds: fall down / rise up video">Download MP4 <span aria-hidden="true">↓</span></a></p>
+        </article>
+        <article class="mesh-clip">
+          <h3 id="04-bipeds-heading">Bipeds</h3>
+          <div class="video-frame">
+            <video class="mesh-video" controls loop muted playsinline preload="none" poster="assets/images/mesh/04-bipeds.webp" aria-labelledby="04-bipeds-heading" width="1920" height="1080">
+              <source src="assets/video/mesh/04-bipeds.mp4" type="video/mp4">
+              <a href="assets/video/mesh/04-bipeds.mp4">Download this video</a>
+            </video>
+          </div>
+          <p class="clip-caption"><span>7.2 seconds</span><a href="assets/video/mesh/04-bipeds.mp4" download aria-label="Download Bipeds video">Download MP4 <span aria-hidden="true">↓</span></a></p>
+        </article>
+        <article class="mesh-clip">
+          <h3 id="05-flying-heading">Flying</h3>
+          <div class="video-frame">
+            <video class="mesh-video" controls loop muted playsinline preload="none" poster="assets/images/mesh/05-flying.webp" aria-labelledby="05-flying-heading" width="1920" height="1080">
+              <source src="assets/video/mesh/05-flying.mp4" type="video/mp4">
+              <a href="assets/video/mesh/05-flying.mp4">Download this video</a>
+            </video>
+          </div>
+          <p class="clip-caption"><span>5.9 seconds</span><a href="assets/video/mesh/05-flying.mp4" download aria-label="Download Flying video">Download MP4 <span aria-hidden="true">↓</span></a></p>
+        </article>
+        <article class="mesh-clip">
+          <h3 id="06-reptiles-marine-heading">Reptiles / marine</h3>
+          <div class="video-frame">
+            <video class="mesh-video" controls loop muted playsinline preload="none" poster="assets/images/mesh/06-reptiles-marine.webp" aria-labelledby="06-reptiles-marine-heading" width="1920" height="1080">
+              <source src="assets/video/mesh/06-reptiles-marine.mp4" type="video/mp4">
+              <a href="assets/video/mesh/06-reptiles-marine.mp4">Download this video</a>
+            </video>
+          </div>
+          <p class="clip-caption"><span>6.5 seconds</span><a href="assets/video/mesh/06-reptiles-marine.mp4" download aria-label="Download Reptiles / marine video">Download MP4 <span aria-hidden="true">↓</span></a></p>
+        </article>
+        <article class="mesh-clip">
+          <h3 id="07-insects-heading">Insects</h3>
+          <div class="video-frame">
+            <video class="mesh-video" controls loop muted playsinline preload="none" poster="assets/images/mesh/07-insects.webp" aria-labelledby="07-insects-heading" width="1920" height="1080">
+              <source src="assets/video/mesh/07-insects.mp4" type="video/mp4">
+              <a href="assets/video/mesh/07-insects.mp4">Download this video</a>
+            </video>
+          </div>
+          <p class="clip-caption"><span>9.2 seconds</span><a href="assets/video/mesh/07-insects.mp4" download aria-label="Download Insects video">Download MP4 <span aria-hidden="true">↓</span></a></p>
+        </article>
+      </div>
+    </section>
+
+    <section id="citation" class="section citation-section" aria-labelledby="citation-heading"><div class="container narrow"><div class="citation-heading"><div><h2 id="citation-heading">BibTeX</h2></div><button id="copy-citation" class="button button-light" type="button">Copy citation</button></div><pre><code id="bibtex">@inproceedings{hwang2027etamotion,
+  title  = {{ETA-Motion}: Efficient Topology-Agnostic Motion
+            Diffusion via Sparse Joint Learning},
+  author = {Hwang, Seoyoung and Kim, Tae-Kyun},
+  booktitle = {Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision (WACV)},
+  year = {2027}
+}</code></pre><p id="copy-status" class="copy-status" role="status" aria-live="polite"></p></div></section>
+  </main>
+  <footer class="container footer"><a class="wordmark" href="#">ETA-Motion</a><p>Seoyoung Hwang &amp; Tae-Kyun Kim<br><span>KAIST · Samsung Electronics</span></p><a href="#" class="back-top">Back to top ↑</a></footer>
+</body>
+</html>
