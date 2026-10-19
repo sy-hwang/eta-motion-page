@@ -3,7 +3,7 @@
 // For a local PDF, place it inside site/assets/ and use "assets/paper.pdf".
 window.ETA_CONFIG = {
   paperUrl: "",
-  codeUrl: "",
+  codeUrl: "https://github.com/sy-hwang/ETA-Motion",
   supplementUrl: "",
   venue: "WACV 2027",
   // Optional: override the WACV 2027 citation when proceedings details are available.
